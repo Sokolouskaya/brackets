@@ -1,20 +1,20 @@
 module.exports = function check(str, bracketsConfig) {
-    const bracketsMapping = bracketsConfig.reduce((acc, [opened, closed]) => ({...acc, [closed]: opened}), {});
-    const bracketsDuplicate = new Set(
-        bracketsConfig
-            .filter(([opened, closed]) => opened === closed)
-            .map(([opened]) => opened)
-    );
+    let bracketsMapping = {};
+    for (let config of bracketsConfig) {
+        bracketsMapping[config[1]] = config[0];
+    }
 
-    const stack = [];
+    let bracketsDuplicate = findDuplicates(bracketsConfig);
+
+    let stack = [];
 
     for (let bracket of str) {
-        const bracketOpposite = bracketsMapping[bracket];
+        let bracketOpposite = bracketsMapping[bracket];
 
         if (!bracketOpposite) {
             stack.push(bracket);
         } else {
-            const last = stack.pop();
+            let last = stack.pop();
 
             if (last !== bracketOpposite) {
                 if (bracketsDuplicate.has(bracketOpposite)) {
@@ -32,3 +32,14 @@ module.exports = function check(str, bracketsConfig) {
 
     return stack.length === 0;
 };
+
+
+function findDuplicates(bracketsConfig) {
+    let set = new Set();
+    for (let config of bracketsConfig) {
+        if (config[1] === config[0]) {
+            set.add(config[1])
+        }
+    }
+    return set;
+}
